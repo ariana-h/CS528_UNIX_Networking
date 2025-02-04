@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port   = htons(PORT);
+    server_addr.sin_addr.s_addr = inet_addr("10.0.0.20");
 
     const char *init_msg = "Hello";
     if (sendto(sockfd, init_msg, strlen(init_msg), 0,
