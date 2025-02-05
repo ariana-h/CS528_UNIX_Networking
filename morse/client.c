@@ -1,3 +1,14 @@
+/*
+    Authors: Ariana Huhko and John Pertell
+    02/2025
+
+    Description: Clients send text messages that are converted to Morse code by the server and sent back. Think of a translation app.
+
+    Why UDP?: Speed is prioritized over reliability since minor loss won't impact understanding. 
+              Imagine if a text message had a typo...not a big deal, humans can still figure out what the word means. 
+              Also a fun way to see the effect of packet loss when using Core.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
