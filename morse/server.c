@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 
 #define PORT 12345
+#define BUFFER_SIZE 1024
 
 struct morse_map {
     char letter;
@@ -34,15 +35,16 @@ const char *lookup_morse(char letter) {
 
 int main(int argc, char **argv) {
 
-    if(argc < 3) {
-        printf("Usage: %s <SERVER_IP> <BROADCAST MESSAGE>\n", argv[0]);
+    if(argc < 2) {
+        printf("Usage: %s <SERVER_IP>\n", argv[0]);
         return 1;
     }
 
     int sockfd;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
-    char buf;
+    //char buf;
+    char buffer[BUFFER_SIZE] = {0};
     
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         perror("socket");
@@ -63,37 +65,47 @@ int main(int argc, char **argv) {
     printf("Server is running and waiting for a client...\n");
     /* Main Loop */
     while(1) {
-        if (recvfrom(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, &client_addr_len) < 0) {
+        int recv_len = recvfrom(sockfd, buffer, BUFFER_SIZE - 1, 0, 
+                    (struct sockaddr*)&client_addr, &client_addr_len);
+        if ( recv_len < 0) {
             perror("recvfrom");
             close(sockfd);
             exit(EXIT_FAILURE);
         }
-        printf("Received request from client.\n");
+ 
+        buffer[recv_len] = '\0';
+        printf("Received message: %s\n", buffer);
+
+        char morse_message[4096] = {0};
+        int morse_index = 0;
         
-        
-        for (size_t i = 0; i < strlen(argv[2]); i++) {
-            char ch = argv[2][i];
+        for (size_t i = 0; i < strlen(buffer); i++) {
+            char ch = toupper(buffer[i]);
             if (ch == ' ') {
-                buf = ' ';
-                if (sendto(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, client_addr_len) < 0)
-                    perror("sendto");
+                if (morse_index < sizeof(morse_message) - 2) {
+                    morse_message[morse_index++] = ' ';
+                }
             } else {
-                ch = toupper(ch);
                 const char *code = lookup_morse(ch);
                 if (code != NULL) {
-                    for (size_t j = 0; j < strlen(code); j++) {
-                        buf = code[j]; 
-                        if (sendto(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, client_addr_len) < 0)
-                            perror("sendto");
+                    if (morse_index + strlen(code) < sizeof(morse_message) - 2) {
+                        strcpy(&morse_message[morse_index], code);
+                        morse_index += strlen(code);
+                        morse_message[morse_index++] = ' ';
                     }
                 }
-                buf = ' ';
-                if (sendto(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, client_addr_len) < 0)
-                    perror("sendto");
             }
         }
+        morse_message[morse_index] = '\0';
+
+        if (sendto(sockfd, morse_message, strlen(morse_message), 0, (struct sockaddr*)&client_addr, client_addr_len) < 0) {
+            perror("sendto");
+        } else {
+            printf("Sent Morse message: %s\n", morse_message);
+        }
+
     }
-    printf("Message sent.\n");
+
     close(sockfd);
     return 0;
 }
