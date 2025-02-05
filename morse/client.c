@@ -34,6 +34,12 @@ char lookup_letter(const char *code) {
 }
 
 int main(int argc, char **argv) {
+
+    if (argc < 2) {
+        printf("Usage: %s <SERVER_IP>\n", argv[0]);
+        return 1;
+    }
+
     int sockfd;
     struct sockaddr_in server_addr, my_addr;
     socklen_t addr_len = sizeof(server_addr);
@@ -60,7 +66,7 @@ int main(int argc, char **argv) {
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port   = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr("10.0.0.20");
+    server_addr.sin_addr.s_addr = inet_addr(argv[1]);
 
     const char *init_msg = "Hello";
     if (sendto(sockfd, init_msg, strlen(init_msg), 0,
@@ -77,23 +83,51 @@ int main(int argc, char **argv) {
          exit(EXIT_FAILURE);
     }
 
+    char message[1024] = {0};
+    int message_index = 0;
+
     printf("Waiting for message from server:\n");
     while (recvfrom(sockfd, &recv_char, 1, 0, NULL, NULL) > 0) {
-         if (recv_char == ' ') {
+        printf("Received: %c\n", recv_char);
 
-             if (token_index == 0) { printf(" "); } 
-             else {
-                 token[token_index] = '\0';
-                 printf("%c", lookup_letter(token));
-                 token_index = 0; 
-             }
-
-         } else if (recv_char == '-' || recv_char == 'o') {
-             token[token_index++] = recv_char;
-         } else {
-             token[token_index++] = recv_char;
-         }
+        if (recv_char == ' ') {
+            if (token_index == 0) { 
+                printf(" (space)\n");
+                if (message_index < sizeof(message) - 1) {
+                    message[message_index++] = ' ';
+                }
+            } else {
+                token[token_index] = '\0';
+                char translated = lookup_letter(token);
+                printf("Morse: %s -> Letter: %c\n", token, translated);
+                
+                if (message_index < sizeof(message) - 1) {
+                    message[message_index++] = translated;
+                }
+                token_index = 0;
+            }
+        } else if (recv_char == '-' || recv_char == 'o') {
+            if (token_index < sizeof(token) - 1) {
+                token[token_index++] = recv_char;
+            }
+        } else {
+            printf("Unexpected character: %c\n", recv_char);
+        }
     }
+
+    if (token_index > 0) {
+        token[token_index] = '\0';
+        char translated = lookup_letter(token);
+        printf("Morse: %s -> Letter: %c\n", token, translated);
+        
+        if (message_index < sizeof(message) - 1) {
+            message[message_index++] = translated;
+        }
+    }
+
+    message[message_index] = '\0';
+    printf("\nFull Translated Message: %s\n", message);
+
     
     printf("\n");
     close(sockfd);

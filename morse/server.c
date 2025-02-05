@@ -34,8 +34,8 @@ const char *lookup_morse(char letter) {
 
 int main(int argc, char **argv) {
 
-    if(argc < 2) {
-        printf("Usage: %s <command_string>\n", argv[0]);
+    if(argc < 3) {
+        printf("Usage: %s <SERVER_IP> <BROADCAST MESSAGE>\n", argv[0]);
         return 1;
     }
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family      = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr("10.0.0.20");
+    server_addr.sin_addr.s_addr = inet_addr(argv[1]);
     server_addr.sin_port        = htons(PORT);
     
     if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
         printf("Received initial message from client.\n");
         
         
-        for (size_t i = 0; i < strlen(argv[1]); i++) {
-            char ch = argv[1][i];
+        for (size_t i = 0; i < strlen(argv[2]); i++) {
+            char ch = argv[2][i];
             if (ch == ' ') {
                 buf = ' ';
                 if (sendto(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, client_addr_len) < 0)
