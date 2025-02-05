@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
     }
 
     message[message_index] = '\0';
+    printf("========================\n");
     printf("\nFull Translated Message: %s\n", message);
 
     

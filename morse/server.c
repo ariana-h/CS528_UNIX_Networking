@@ -61,7 +61,6 @@ int main(int argc, char **argv) {
     }
     
     printf("Server is running and waiting for a client...\n");
-
     /* Main Loop */
     while(1) {
         if (recvfrom(sockfd, &buf, 1, 0, (struct sockaddr*)&client_addr, &client_addr_len) < 0) {
@@ -69,7 +68,7 @@ int main(int argc, char **argv) {
             close(sockfd);
             exit(EXIT_FAILURE);
         }
-        printf("Received initial message from client.\n");
+        printf("Received request from client.\n");
         
         
         for (size_t i = 0; i < strlen(argv[2]); i++) {
