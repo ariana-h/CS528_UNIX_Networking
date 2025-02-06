@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 
+#define LETTER_DELIMITTER '/'
+
 #define PORT 12345
 #define BUFF_SIZE 4096
 
@@ -175,7 +177,7 @@ int main(int argc, char **argv)
                 for (int i = 0; i < total_bytes; i++) {
                     char c = recv_buffer[i];
 
-                    if (c == '#') {
+                    if (c == LETTER_DELIMITTER) {
                         // End of one letter
                         token[token_idx] = '\0';
                         if (token_idx > 0)

@@ -4,7 +4,7 @@
 
     Description: The server converts plaintext messages sent by the clients into
                  Morse code and sends it back, one symbol('o' or '-') at a time.
-                 Letters are separated by '#' and words are separated by a space. 
+                 Letters are separated by '/' and words are separated by a space. 
 
     Why UDP?: Speed is prioritized over reliability since minor loss won't impact understanding.
               Also a fun way to see the effect of packet loss when using Core.
@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+
+#define LETTER_DELIMITTER "/"
 
 #define PORT 12345
 #define BUFFER_SIZE 1024
@@ -93,6 +95,7 @@ int main(int argc, char **argv) {
         buffer[recv_len] = '\0';
         printf("Received message: %s\n", buffer);
 
+        printf("SENDING MORSE CODE:\n\t");
         for (size_t i = 0; i < strlen(buffer); i++) {
             char ch = toupper(buffer[i]);
 
@@ -100,6 +103,7 @@ int main(int argc, char **argv) {
             if (ch == ' ') {
                 sendto(sockfd, " ", 1, 0,
                        (struct sockaddr*)&client_addr, client_addr_len);
+                printf(" ");
                 continue;
             }
 
@@ -111,13 +115,15 @@ int main(int argc, char **argv) {
                     char symbol[2] = {code[j], '\0'};
                     sendto(sockfd, symbol, 1, 0,
                            (struct sockaddr*)&client_addr, client_addr_len);
+                    printf("%s", symbol);
                 }
-                // Send '#' to separate letters
-                sendto(sockfd, "#", 1, 0,
+                // Send LETTER_DELIMITTER to separate letters
+                sendto(sockfd, LETTER_DELIMITTER, 1, 0,
                        (struct sockaddr*)&client_addr, client_addr_len);
+                printf("%s", LETTER_DELIMITTER);
             }
         }
-        printf("Finished sending Morse code.\n");
+        printf("\nFinished sending Morse code.\n");
     }
 
     close(sockfd);
