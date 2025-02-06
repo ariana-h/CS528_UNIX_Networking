@@ -18,7 +18,7 @@
 
     Description: A UDP client that sends plaintext messages to a server.
                  The server responds with Morse code where each dot/dash is a separate character,
-                 letters are separated by '#', and words are separated by a space. 
+                 letters are separated by '/', and words are separated by a space. 
                 
     Decoding?
                  The user can pass in an optional '-d' argument to specify if they want to
