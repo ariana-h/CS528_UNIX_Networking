@@ -107,8 +107,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Morse Client running.\n");
-    printf("==========================================\n");
+    printf("Morse Client running.\n\n");
     while (1)
     {
         char user_input[256];
@@ -206,15 +205,15 @@ int main(int argc, char **argv)
                 }
 
                 final_message[final_idx] = '\0';
-                printf("Decoded Text: %s\n\n", final_message);
+                printf("Decoded Text: %s\n", final_message);
             }
-            printf("==========================================\n\n");
+            printf("\n.......................................................................\n\n");
         } else { 
             printf("\nNo data received from server.\n\n"); 
         }
     }
 
     close(sockfd);
-    printf("Exiting client...\n");
+    printf("\nExiting client...\n");
     return 0;
 }

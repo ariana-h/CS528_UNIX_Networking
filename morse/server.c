@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Server is running and waiting for a client on %s:%d...\n",
+    printf("Server is running and waiting for a client on %s:%d...\n\n",
            argv[1], PORT);
 
     while (1) {
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
         buffer[recv_len] = '\0';
         printf("Received message: %s\n", buffer);
 
-        printf("SENDING MORSE CODE:\n\t");
+        printf("Sending morse code: ");
         for (size_t i = 0; i < strlen(buffer); i++) {
             char ch = toupper(buffer[i]);
 
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
                 printf("%s", LETTER_DELIMITTER);
             }
         }
-        printf("\nFinished sending Morse code.\n");
+        printf("\nFinished sending Morse code.\n\n");
     }
 
     close(sockfd);
