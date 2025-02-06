@@ -1,32 +1,40 @@
-/*
-    Authors: Ariana Huhko and John Pertell
-    02/2025
-
-    Description: Clients send text messages that are converted to Morse code by the server and sent back. Think of a translation app.
-
-    Why UDP?: Speed is prioritized over reliability since minor loss won't impact understanding. 
-              Imagine if a text message had a typo...not a big deal, humans can still figure out what the word means. 
-              Also a fun way to see the effect of packet loss when using Core.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <ctype.h>
 #include <errno.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 
 #define PORT 12345
-#define BUFFER_SIZE 1024
+#define BUFF_SIZE 4096
+
+/*
+    Authors: Ariana Huhko and John Pertell
+    02/2025
+
+    Description: A UDP client that sends plaintext messages to a server.
+                 The server responds with Morse code where each dot/dash is a separate character,
+                 letters are separated by '#', and words are separated by a space. 
+                
+    Decoding?
+                 The user can pass in an optional '-d' argument to specify if they want to
+                 decode the recieved data.
+
+    Packet Drop?
+                 If a word can not be translated (I.E., bad packet drop), the decoded letter may be 
+                 replaced with a '?' instead. 
+                 A false letter may be decoded in the event of packet drop, the correct letter may be
+                 interpreted by the user by examining the context of the morse code.
+*/
 
 struct morse_map {
     char letter;
     const char *code;
 };
 
-struct morse_map morse_table[] = {
+static struct morse_map morse_table[] = {
     {'A', "o-"},    {'B', "-ooo"},  {'C', "-o-o"},  {'D', "-oo"},
     {'E', "o"},     {'F', "oo-o"},  {'G', "--o"},   {'H', "oooo"},
     {'I', "oo"},    {'J', "o---"},  {'K', "-o-"},   {'L', "o-oo"},
@@ -37,125 +45,174 @@ struct morse_map morse_table[] = {
     {0, NULL}
 };
 
-char lookup_letter(const char *code) {
-    for (int i = 0; morse_table[i].letter; i++) {
-        if (strcmp(morse_table[i].code, code) == 0)
-            return morse_table[i].letter;
+/* Attempts to decode a token 
+   If token can not be decoded, then a '?' 
+   will be used instead.
+*/
+static char decode_morse(const char *token)
+{
+    for (int j = 0; morse_table[j].letter != 0; j++) {
+        if (strcmp(morse_table[j].code, token) == 0) {
+            return morse_table[j].letter;
+        }
     }
-    return '?';  // unknown 
+    return '?';
 }
 
-
-int main(int argc, char **argv) {
-
+int main(int argc, char **argv)
+{
     if (argc < 2) {
-        printf("Usage: %s <SERVER_IP>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <SERVER_IP> [-d]\n", argv[0]);
         return 1;
     }
-    
-    int sockfd;
-    struct sockaddr_in server_addr, my_addr;
-    socklen_t addr_len = sizeof(server_addr);
-    
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-         perror("socket");
-         exit(EXIT_FAILURE);
-    }
-    
-    memset(&my_addr, 0, sizeof(my_addr));
-    my_addr.sin_family = AF_INET;
-    my_addr.sin_addr.s_addr = INADDR_ANY;
-    my_addr.sin_port = 0;
-    
-    if (bind(sockfd, (struct sockaddr*)&my_addr, sizeof(my_addr)) < 0) {
-         perror("bind");
-         close(sockfd);
-         exit(EXIT_FAILURE);
-    }
-    
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port   = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr(argv[1]);  
 
-    while(1) {
-        // Take user input and send to server
+    // Check if decoding is enabled
+    int decode = 0;
+    if (argc > 2 && strcmp(argv[2], "-d") == 0) {
+        decode = 1;
+    }
+
+    // Create socket
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        perror("socket");
+        return 1;
+    }
+
+    struct sockaddr_in my_addr;
+    memset(&my_addr, 0, sizeof(my_addr));
+    my_addr.sin_family      = AF_INET;
+    my_addr.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(sockfd, (struct sockaddr*)&my_addr, sizeof(my_addr)) < 0) {
+        perror("bind");
+        close(sockfd);
+        return 1;
+    }
+
+    // Set up server address struct
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family      = AF_INET;
+    server_addr.sin_port        = htons(PORT);
+    server_addr.sin_addr.s_addr = inet_addr(argv[1]);
+
+    // Set a short receive timeout so we know when the server is done
+    struct timeval tv = {0, 500000};
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        perror("setsockopt");
+        close(sockfd);
+        return 1;
+    }
+
+    printf("Morse Client running.\n");
+    printf("==========================================\n");
+    while (1)
+    {
         char user_input[256];
         printf("Enter a message to send (or type 'exit' to quit): ");
         fgets(user_input, sizeof(user_input), stdin);
-        user_input[strcspn(user_input, "\n")] = '\0'; // Remove newline if necessary
 
+        // Trim newline => replace with '\0'
+        user_input[strcspn(user_input, "\n")] = '\0';
+
+        // Checking for exit command
         if (strcmp(user_input, "exit") == 0) {
             break;
         }
 
-        if (sendto(sockfd, user_input, strlen(user_input), 0,
-                (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        // Send user input to server
+        ssize_t sent = sendto(sockfd, user_input, strlen(user_input), 0,
+                              (struct sockaddr*)&server_addr, sizeof(server_addr));
+        if (sent < 0) {
             perror("sendto");
-            close(sockfd);
-            exit(EXIT_FAILURE);
+            break;
         }
 
-        struct timeval tv = {0, 1};
-        if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-            perror("setsockopt");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
-        
-        char morse_message[BUFFER_SIZE] = {0};
-        int morse_index = 0;
+        // Prepare to receive server's Morse response
+        char recv_buffer[BUFF_SIZE];
+        memset(recv_buffer, 0, sizeof(recv_buffer));
+        int total_bytes = 0; // ensure buffer does not overfill
 
-        printf("Waiting for Morse code from server...\n\n");
-        ssize_t recv_len;
-        while ((recv_len = recvfrom(sockfd, morse_message + morse_index, BUFFER_SIZE - morse_index - 1, 0, NULL, NULL)) > 0) {
-            morse_index += recv_len;
-            if (morse_index >= BUFFER_SIZE - 1 || morse_message[morse_index - 1] == '\0') {
+        // Receiving loop
+        while (1) {
+            ssize_t r = recvfrom(sockfd, recv_buffer+total_bytes,
+                                 BUFF_SIZE-total_bytes-1, 0, NULL, NULL);
+            if (r < 0) {
+                // timeout => leave loop
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    break;
+                } else {
+                    perror("recvfrom");
+                    break;
+                }
+            } else if (r == 0) {
+                // No more data => leave loop
                 break;
+            } else {
+                total_bytes += r;
+                if (total_bytes >= BUFF_SIZE - 1)
+                    break; // buffer full
             }
         }
 
-        morse_message[morse_index] = '\0';
-        printf("\tMorse Code Message: %s", morse_message);
+        // Null terminate received data
+        recv_buffer[total_bytes] = '\0';
 
-        char message[BUFFER_SIZE] = {0};
-        int message_index = 0;
-        char token[12];
-        int token_index = 0;
+        // Display Morse Code
+        if (total_bytes > 0) {
+            printf("\nReceived Morse Code: %s\n", recv_buffer);
 
-        for (int i = 0; morse_message[i] != '\0'; i++) {
-            if (morse_message[i] == ' ') {
-                if (token_index > 0) { // Translate token
-                    token[token_index] = '\0';
-                    char translated = lookup_letter(token);
-                    message[message_index++] = translated;
-                    token_index = 0;
-                } else { // Handle space between words
-                    if (message_index < sizeof(message) - 1) {
-                        message[message_index++] = ' ';
+            // Only decode if the user enabled it with -d
+            if (decode) {
+                char final_message[BUFF_SIZE];
+                memset(final_message, 0, sizeof(final_message));
+                int final_idx = 0;
+
+                char token[64];
+                int token_idx = 0;
+
+                for (int i = 0; i < total_bytes; i++) {
+                    char c = recv_buffer[i];
+
+                    if (c == '#') {
+                        // End of one letter
+                        token[token_idx] = '\0';
+                        if (token_idx > 0)
+                            final_message[final_idx++] = decode_morse(token);
+                        token_idx = 0;
+                    } else if (c == ' ') {
+                        // Space => separate word
+                        if (token_idx > 0) {
+                            token[token_idx] = '\0';
+                            final_message[final_idx++] = decode_morse(token);
+                            token_idx = 0;
+                        }
+                        // Then add a space to final_message
+                        final_message[final_idx++] = ' ';
+                    } else {
+                        // This is a dot or dash => accumulate in token
+                        if (token_idx < (int)sizeof(token) - 1)  
+                            token[token_idx++] = c;
                     }
                 }
-            } else {
-                if (token_index < sizeof(token) - 1) {
-                    token[token_index++] = morse_message[i];
+
+                // If there's a leftover token that never ended with '#' or space
+                if (token_idx > 0) {
+                    token[token_idx] = '\0';
+                    final_message[final_idx++] = decode_morse(token);
                 }
+
+                final_message[final_idx] = '\0';
+                printf("Decoded Text: %s\n\n", final_message);
             }
+            printf("==========================================\n\n");
+        } else { 
+            printf("\nNo data received from server.\n\n"); 
         }
-
-        if (token_index > 0) {
-            token[token_index] = '\0';
-            char translated = lookup_letter(token);
-            message[message_index++] = translated;
-        }
-
-        message[message_index] = '\0';
-        printf("\n\tFull Translated Message: %s\n", message);
-        
-        printf("\n===================================================================\n\n");
     }
-    
-    printf("Exiting client...\n");
+
     close(sockfd);
+    printf("Exiting client...\n");
     return 0;
 }
-
