@@ -11,6 +11,9 @@ This project implements a simple UDP-based client-server system that translates 
 - **Packet Drop Handling**: In the event of packet loss, the user can use the context clues of the morse code to reconstruct the message.
 - **BAD Packet Drop Handling**: In case of BAD packet loss, undecodable letters are replaced with `?`.
 
+## Why UDP?
+UDP is used instead of TCP for speed and efficiency. Since Morse code can tolerate minor packet loss without significantly affecting understanding, UDP allows faster transmission while introducing an interesting challenge related to real-world packet loss scenarios.
+
 ## Files
 - `client.c` - The UDP client that sends plaintext messages and optionally decodes Morse responses.
 - `server.c` - The UDP server that translates messages into Morse code and sends them back to the client.
@@ -57,5 +60,3 @@ To enable Morse code decoding:
 - Letters are separated by `#`.
 - Words are separated by spaces.
 
-## Why UDP?
-UDP is used instead of TCP for speed and efficiency. Since Morse code can tolerate minor packet loss without significantly affecting understanding, UDP allows faster transmission while introducing an interesting challenge related to real-world packet loss scenarios.
