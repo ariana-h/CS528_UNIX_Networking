@@ -8,7 +8,8 @@ This project implements a simple UDP-based client-server system that translates 
 - **UDP Communication**: The client and server communicate using the UDP protocol.
 - **Morse Code Encoding**: The server translates received text into Morse code.
 - **Morse Code Decoding**: The client can decode the Morse response if the `-d` flag is specified.
-- **Packet Drop Handling**: In case of packet loss, undecodable letters are replaced with `?`.
+- **Packet Drop Handling**: In the event of packet loss, the user can use the context clues of the morse code to reconstruct the message.
+- **BAD Packet Drop Handling**: In case of BAD packet loss, undecodable letters are replaced with `?`.
 
 ## Files
 - `client.c` - The UDP client that sends plaintext messages and optionally decodes Morse responses.
