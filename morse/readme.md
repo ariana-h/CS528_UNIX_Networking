@@ -2,7 +2,7 @@
 
 
 ## Overview
-This project implements a simple UDP-based client-server system that translates plaintext messages into Morse code. The server receives plaintext messages from clients and responds with the corresponding Morse code representation. Each Morse code symbol is sent as a separate character, with letters separated by `#` and words separated by spaces. The client can optionally decode the Morse code back into plaintext.
+This project implements a simple UDP-based client-server system that translates plaintext messages into Morse code. The server receives plaintext messages from clients and responds with the corresponding Morse code representation. Each Morse code symbol is sent as a separate character, with letters separated by `/` and words separated by spaces. The client can optionally decode the Morse code back into plaintext.
 
 ## Features
 - **UDP Communication**: The client and server communicate using the UDP protocol.
@@ -57,6 +57,6 @@ To enable Morse code decoding:
 
 ## Morse Code Format
 - Each Morse symbol (`o` for dot, `-` for dash) is sent as an individual character.
-- Letters are separated by `#`.
+- Letters are separated by `/`.
 - Words are separated by spaces.
 
