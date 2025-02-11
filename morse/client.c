@@ -198,7 +198,7 @@ int main(int argc, char **argv)
                     }
                 }
 
-                // If there's a leftover token that never ended with '#' or space
+                // If there's a leftover token that never ended with '/' or space
                 if (token_idx > 0) {
                     token[token_idx] = '\0';
                     final_message[final_idx++] = decode_morse(token);
