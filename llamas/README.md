@@ -1,5 +1,5 @@
 # Oh the Llamas!
-
+``source venv/bin/activate``
 ## Overview
 
 ## Features
