@@ -2,7 +2,7 @@
 
 from ollama import Client
 
-model_name = "llama2"
+model_name = "llama3.2"
 host_addr = "localhost"
 
 def main():
