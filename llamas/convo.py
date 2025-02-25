@@ -4,7 +4,7 @@ from ollama import Client
 
 model_name = "llama3.2"
 host_model = "llama3.1"
-host_addr = "150.156.81.69"
+host_addr = "localhost"
 
 def main():
     client = Client(host=f'http://{host_addr}:11434')
