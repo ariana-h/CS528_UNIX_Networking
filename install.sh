@@ -1,10 +1,9 @@
 #!/bin/bash
 
-cd ~
-mkdir -p ~/python_packages/
-mkdir -p ~/ollama_whl/
+mkdir -p python_packages/
+mkdir -p ollama_whl/
 
-cd ~/ollama_whl
+cd ollama_whl
 pip download ollama
 
 for file in *.whl; do
