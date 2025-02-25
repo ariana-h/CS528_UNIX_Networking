@@ -5,3 +5,4 @@ __pycache__/
 *.pyd
 python_packages/
 ollama_whl/
+venv/
