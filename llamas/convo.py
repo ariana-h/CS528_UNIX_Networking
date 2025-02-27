@@ -3,7 +3,7 @@
 from ollama import Client
 
 model_name = "llama3.2"
-host_model = "deepseek-r1:8b"
+host_model = "llama3.1"
 host_addr = "localhost"
 
 def create_client(str):
@@ -32,12 +32,12 @@ def main():
         messages.append({'role': 'user', 'content': init_input})
         response = chat_with_model(client, model_name, messages)
         if response:
-            print(f"{model_name}: {response}")
+            print(f"{response}")
             messages.append({'role': 'assistant', 'content': response})
 
         response = chat_with_model(host, host_model, messages)
         if response:
-            print(f"{host_model}: {response}")
+            print(f"{response}")
             messages.append({'role': 'assistant', 'content': response})
 
 if __name__ == "__main__":
