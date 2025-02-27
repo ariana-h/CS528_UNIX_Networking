@@ -3,7 +3,7 @@
 from ollama import Client
 
 model_name = "llama3.2"
-host_model = "llama3.1"
+host_model = "deepseek-r1:8b"
 host_addr = "localhost"
 
 def create_client(str):
@@ -12,10 +12,9 @@ def create_client(str):
 def chat_with_model(client, model_name, messages):
     try:
         response = client.chat(model=model_name, messages=messages)
-        if 'message' in response:
-            return response['message']['content']
-        else: print("Unexpected response format:", response)
-    except Exception as e: print(f"Error communicating with {model_name}: {e}")
+        if 'message' in response: return response['message']['content']
+        else: print("response format:", response)
+    except Exception as e: print(f"{e}")
 
     return ""
 
@@ -24,7 +23,7 @@ def main():
     host = create_client("localhost")
 
     messages = []
-    init_input = input(f"{model_name}: ")
+    init_input = input(f"Initial Input: ")
     while True:
         if init_input.lower() == 'exit':
             print("Goodbye!")
