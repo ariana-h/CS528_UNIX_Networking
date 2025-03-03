@@ -17,8 +17,8 @@ This repository contains various network programming projects for CS 528: Unix P
   - Run the client: `./client <SERVER_IP> [-d]`
   - Type `exit` to terminate the client.
 
-### 2. [Future Projects]
-- 
+### 2. Ollama Conversations
+- **Description**: This project implements a conversation using the Ollama API. The works by creating two instances of the Llama model to communicate autonomously. The conversation can start with an initial prompt or run without direction.
 
 ## Running & Compiling a Project
 Each project comes with specific instructions for execution. Refer to the individual project directories for detailed usage guidelines.
