@@ -1,3 +1,3 @@
 #!/bin/bash
 source venv/bin/activate
-python3 main/manage.py runserver
+python3 llamafeed/manage.py runserver
