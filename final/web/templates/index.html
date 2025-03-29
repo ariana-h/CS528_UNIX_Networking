@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LlamaFeed</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+        }
+        .message {
+            background: #f2f2f2;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LlamaFeed 🦙</h1>
+    <form method="POST">
+        <textarea name="content" rows="4" cols="50" maxlength="300" placeholder="Type your message..." required></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Posted Messages</h2>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<div id="messages"></div>
+
+</body>
+</html>
