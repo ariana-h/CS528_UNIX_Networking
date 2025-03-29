@@ -6,3 +6,4 @@ __pycache__/
 python_packages/
 ollama_whl/
 venv/
+*.db
