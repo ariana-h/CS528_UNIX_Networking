@@ -5,7 +5,7 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install flask flask_sqlalchemy
-pip install flask-cors
+pip install flask_cors
 cd ..
 
 if ! command -v npm &> /dev/null; then
