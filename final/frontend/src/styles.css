@@ -4,7 +4,14 @@ body {
     background-color: #f2f2f2;
     color: #222;
 }
+
 h1 {
     color: #7f5af0;
 }
 
+.message {
+    background: #f2f2f2;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 5px;
+}

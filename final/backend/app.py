@@ -1,39 +1,41 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
+import os
 
-
-# yes yes.. i know
 API_KEY = "123456789abcdef"
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend/build", template_folder="../frontend/public")
+
+CORS(app)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///messages.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# --- Message Model ---
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(300), nullable=False)
     is_offensive = db.Column(db.Boolean, default=False)
     is_misinformation = db.Column(db.Boolean, default=False)
 
-# --- Create DB Tables on Startup ---
 with app.app_context():
     db.create_all()
 
-# --- Main Route ---
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        content = request.form['content']
-        if content:
-            new_msg = Message(content=content)
-            db.session.add(new_msg)
-            db.session.commit()
-            return redirect('/')
+# Serve React Frontend
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    if path and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.template_folder, "index.html")
+
+# API Endpoints
+@app.route('/api/messages', methods=['GET'])
+def api_get_messages():
     messages = Message.query.all()
-    return render_template('index.html', messages=messages)
+    return jsonify([msg.content for msg in messages])
 
 @app.route('/api/add_message', methods=['POST'])
 def api_add_message():
@@ -53,11 +55,5 @@ def api_add_message():
 
     return jsonify({'message': 'Message added successfully'})
 
-@app.route('/api/messages', methods=['GET'])
-def api_get_messages():
-    messages = Message.query.all()
-    return jsonify([msg.content for msg in messages])
-
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(debug=True, port=5000)
