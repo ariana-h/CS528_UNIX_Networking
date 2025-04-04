@@ -1,5 +1,4 @@
 # LlamaFeed
-Feed so clean, it’s llama-approved and lean.
 
 ## Abstract
 
