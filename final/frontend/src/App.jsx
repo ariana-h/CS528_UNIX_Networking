@@ -8,18 +8,22 @@ function App() {
     const [activeTab, setActiveTab] = useState("posts");
     const [trustLevels, setTrustLevels] = useState({});
     const [showPostBox, setShowPostBox] = useState(false);
+    const [showWelcomePopup, setShowWelcomePopup] = useState(true); // Always show the popup
 
     useEffect(() => {
+        // Fetch messages on mount and at regular intervals
         fetchMessages().then((msgs) => {
             setMessages(msgs);
             setTrustLevels(generateTrustLevels(msgs));
         });
+
         const interval = setInterval(() => {
             fetchMessages().then((msgs) => {
                 setMessages(msgs);
                 setTrustLevels(generateTrustLevels(msgs));
             });
         }, 5000);
+
         return () => clearInterval(interval);
     }, []);
 
@@ -40,8 +44,30 @@ function App() {
         }, {});
     }
 
+    // Handle closing the welcome popup
+    const closeWelcomePopup = () => {
+        setShowWelcomePopup(false);
+    };
+
     return (
         <div className="container">
+            {/* Welcome Popup */}
+            {showWelcomePopup && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <div className="popup-header">
+                            <h1 className="popup-title">
+                                Welcome to <img src="/llama.svg" alt="Llama Logo" className="popup-logo" /> LlamaFeed!
+                            </h1>
+                        </div>
+                        <p className="popup-subtitle">no drama, just llama.</p>
+                        <div className="popup-btn-container">
+                            <button className="popup-btn" onClick={closeWelcomePopup}>Let's Go</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Sidebar Navigation */}
             <nav className="sidebar">
                 <div className="logo-title">
