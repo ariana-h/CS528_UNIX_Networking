@@ -264,13 +264,15 @@ body {
 }
 
 .popup-btn {
-    padding: 10px 20px;
+    padding: 12px 30px;
     font-size: 18px;
     background-color: #56b0dd;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
+    text-align: center;
+    display: inline-block;
 }
 
 .popup-btn:hover {
