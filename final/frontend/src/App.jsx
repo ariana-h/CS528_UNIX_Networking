@@ -99,16 +99,19 @@ function App() {
                         </div>    
                         <div className="posts">
                             {messages.map((msg, index) => (
-                                <div key={index} className="post-row">
-                                    <div className="post">{msg}</div>
-                                    <div className="trust-indicator">
-                                        <span>{trustLevels[index]}</span>
-                                        <button className="trust-dropdown" onClick={() => alert('Dropdown clicked!')}>
-                                            ⬇
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                            <div key={index} className="post-row">
+                            <div className="post">{msg.content}</div>
+                            <div className="trust-indicator">
+                                <span>
+                                Misinformation: {msg.is_misinformation ? "Yes ⚠️" : "No ✅"}<br />
+                                Offensive: {msg.is_offensive ? "Yes 🚫" : "No ✅ "}
+                                </span>
+                                <button className="trust-dropdown" onClick={() => alert('Dropdown clicked!')}>
+                                ⬇
+                                </button>
+                            </div>
+                            </div>
+                        ))}
                         </div>
                     </div>
                 )}
@@ -132,7 +135,7 @@ function App() {
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                             rows="4"
-                            cols="50"
+                            cols="55"
                             maxLength="300"
                             placeholder="Type your message..."
                             required
