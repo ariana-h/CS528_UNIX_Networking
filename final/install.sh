@@ -6,6 +6,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install flask flask_sqlalchemy
 pip install flask_cors
+pip install ollama
 cd ..
 
 if ! command -v npm &> /dev/null; then
