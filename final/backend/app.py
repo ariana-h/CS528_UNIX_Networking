@@ -36,7 +36,9 @@ def serve_react(path):
     if path and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     return send_from_directory(app.template_folder, "index.html")
-
+"""
+curl http://localhost:5000/api/messages
+"""
 @app.route('/api/messages', methods=['GET'])
 def api_get_messages():
     messages = Message.query.all()
@@ -50,7 +52,12 @@ def api_get_messages():
         for msg in messages
     ])
 
-
+"""
+curl -X POST http://localhost:5000/api/add_message \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: 123456789abcdef" \
+  -d '{"content": "This is a test message."}'
+"""
 @app.route('/api/add_message', methods=['POST'])
 def api_add_message():
     key = request.headers.get('X-API-KEY')
@@ -78,6 +85,10 @@ def api_add_message():
 
     return jsonify({'message': 'Message added successfully'})
 
+"""
+curl -X DELETE http://localhost:5000/api/delete_messages_before/2024-12-31 \
+  -H "X-API-KEY: 123456789abcdef"
+"""
 @app.route('/api/delete_messages_before/<string:yyyymmdd>', methods=['DELETE'])
 def api_delete_messages_before(yyyymmdd):
     key = request.headers.get('X-API-KEY')
@@ -95,6 +106,9 @@ def api_delete_messages_before(yyyymmdd):
     db.session.commit()
     return jsonify({'deleted': deleted})
 
+"""
+curl http://localhost:5000/api/daily_summaries
+"""
 @app.route('/api/daily_summaries', methods=['GET'])
 def api_get_summaries():
     """Return all stored summaries, newest first."""
@@ -107,6 +121,12 @@ def api_get_summaries():
         } for r in rows
     ])
 
+"""
+curl -X POST http://localhost:5000/api/daily_summary \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: 123456789abcdef" \
+  -d '{"content": "Summary for the day.", "date": "2025-04-05"}'
+"""
 @app.route('/api/daily_summary', methods=['POST', 'PUT'])
 def api_upsert_summary():
     """Create or replace the summary for a given date (defaults to today)."""
