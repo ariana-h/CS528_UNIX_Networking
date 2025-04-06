@@ -7,6 +7,8 @@ source venv/bin/activate
 pip install flask flask_sqlalchemy
 pip install flask_cors
 pip install ollama
+pip install requests
+
 cd ..
 
 if ! command -v npm &> /dev/null; then
