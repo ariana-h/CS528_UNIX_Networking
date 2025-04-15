@@ -270,6 +270,40 @@ body {
     margin-top: 0.5rem;
 }
 
+.summary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+    margin-left: -20px;
+}
+
+.summary-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    min-height: 150px;
+    width: 97%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.summary-box h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.summary-box p {
+    font-size: 16px;
+    color: #666;
+}
+
 .popup-logo {
     width: 60px;
     height: auto;

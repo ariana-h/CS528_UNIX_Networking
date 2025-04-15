@@ -133,7 +133,12 @@ function App() {
 
                 {activeTab === "summaries" && (
                     <div className="summaries">
-                        <p>Summarized content will appear here.</p>
+                        <div className="summary-container">
+                            <div className="summary-box">
+                                <h3>Day 1</h3>
+                                <p>This is an empty summary box. You can add your content here.</p>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
