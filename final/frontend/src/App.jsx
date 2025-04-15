@@ -151,15 +151,20 @@ function App() {
                 <div className="post-box-overlay">
                     <div className="post-box">
                         <h3>New Post</h3>
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            rows="4"
-                            cols="55"
-                            maxLength="300"
-                            placeholder="Type your message..."
-                            required
-                        />
+                        <div className="textarea-wrapper">
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                rows="4"
+                                cols="55"
+                                maxLength="300"
+                                placeholder="Type your message..."
+                                required
+                            />
+                            <div className={`char-counter-inside ${content.length > 250 ? 'char-warning' : ''}`}>
+                                {content.length}/300
+                            </div>
+                        </div>
                         <div className="post-box-buttons">
                             <button onClick={() => setShowPostBox(false)}>Cancel</button>
                             <button onClick={handleSubmit}>Submit</button>

@@ -229,6 +229,29 @@ body {
     display: inline-block;
 }
 
+.textarea-wrapper {
+    position: relative;
+    width: fit-content;
+    display: inline-block;
+}
+
+.textarea-wrapper textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 24px; /* space for the counter */
+    resize: none;
+}
+
+.char-counter-inside {
+    position: absolute;
+    bottom: 8px;
+    right: 5px;
+    font-size: 11px;
+    color:gray;
+    pointer-events: none;
+    padding-left: 4px;
+}
+
 .post-with-trust {
     display: flex;
     flex-direction: row;
