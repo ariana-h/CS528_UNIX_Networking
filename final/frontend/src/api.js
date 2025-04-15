@@ -10,7 +10,7 @@ export async function addMessage(content) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-API-KEY": "123456789abcdef", // Replace with something
+            "X-API-KEY": "123456789abcdef", 
         },
         body: JSON.stringify({ content }),
     });
