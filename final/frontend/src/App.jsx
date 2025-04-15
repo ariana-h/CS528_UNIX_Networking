@@ -8,7 +8,8 @@ function App() {
     const [activeTab, setActiveTab] = useState("posts");
     const [trustLevels, setTrustLevels] = useState({});
     const [showPostBox, setShowPostBox] = useState(false);
-    const [showWelcomePopup, setShowWelcomePopup] = useState(true); // Always show the popup
+    const [showWelcomePopup, setShowWelcomePopup] = useState(true);
+    const [openDropdowns, setOpenDropdowns] = useState({});
 
     useEffect(() => {
         // Fetch messages on mount and at regular intervals
@@ -44,9 +45,15 @@ function App() {
         }, {});
     }
 
-    // Handle closing the welcome popup
     const closeWelcomePopup = () => {
         setShowWelcomePopup(false);
+    };
+
+    const toggleDropdown = (index) => {
+        setOpenDropdowns((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
     };
 
     return (
@@ -99,19 +106,27 @@ function App() {
                         </div>    
                         <div className="posts">
                             {messages.map((msg, index) => (
-                            <div key={index} className="post-row">
-                            <div className="post">{msg.content}</div>
-                            <div className="trust-indicator">
-                                <span>
-                                Misinformation: {msg.is_misinformation ? "Yes ⚠️" : "No ✅"}<br />
-                                Offensive: {msg.is_offensive ? "Yes 🚫" : "No ✅ "}
-                                </span>
-                                <button className="trust-dropdown" onClick={() => alert('Dropdown clicked!')}>
-                                ⬇
-                                </button>
-                            </div>
-                            </div>
-                        ))}
+                                <div key={index} className="post-row">
+                                    <div className="post">{msg.content}</div>
+                                    <div className="trust-indicator">
+                                        <span>
+                                            Misinformation: {msg.is_misinformation ? "Yes ⚠️" : "No ✅"}<br />
+                                            Offensive: {msg.is_offensive ? "Yes 🚫" : "No ✅ "}
+                                        </span>
+                                        <button className="trust-dropdown" onClick={() => toggleDropdown(index)}>
+                                            {openDropdowns[index] ? "▾" : "▸"}
+                                        </button>
+                                        {openDropdowns[index] && (
+                                            <div className="dropdown-explanation">
+                                                <p>
+                                                    This post was analyzed using a language model classifier. A "Yes" means the post has signs
+                                                    of misinformation or offensive content. Use your judgment when reading.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

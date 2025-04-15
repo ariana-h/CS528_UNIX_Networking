@@ -29,7 +29,7 @@ body {
 .logo {
     width: 100px;
     height: auto;
-    margin-left: 550;
+    margin-left: 50px;
 }
 
 .sidebar button {
@@ -81,16 +81,11 @@ body {
     gap: 10px;
 }
 
-.trust-indicator-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 .posts-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
+    gap: 30px;
 }
 
 .posts-title h3,
@@ -101,15 +96,20 @@ body {
     margin: 0;
 }
 
-.posts-title {
-    text-align: left;
-}
-
+.posts-title,
 .trust-indicator-title {
     text-align: left;
 }
 
 .posts {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.trust-indicator-container {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -124,7 +124,7 @@ body {
     justify-content: space-between;
     align-items: center;
     min-height: 10px;
-    width: 25%; 
+    width: 25%;
     overflow: hidden;
 }
 
@@ -133,9 +133,8 @@ body {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    margin-right: 20px;
     min-height: 32px;
-    width: 100%;
+    width: 75%;
     overflow: hidden;
 }
 
@@ -223,13 +222,52 @@ body {
     color: white;
     padding: 12px 30px;
     font-size: 18px;
-    background-color: #56b0dd;
-    color: white;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     text-align: center;
     display: inline-block;
+}
+
+.post-with-trust {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    background: #f8f8f8;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    align-items: flex-start;
+}
+
+.trust-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    min-width: 200px;
+}
+
+.trust-dropdown {
+    margin-top: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.dropdown-explanation {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.dropdown-explanation.open {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 0.5rem;
 }
 
 .popup-logo {
@@ -242,7 +280,6 @@ body {
 .popup-title {
     font-size: 40px;
     font-family: 'Copperplate', fantasy;
-    /*font-weight: bold;*/
     color: #56b0dd;
     margin-bottom: 10px;
     display: flex;
@@ -273,7 +310,7 @@ body {
     background: rgb(250, 249, 249);
     padding: 30px;
     border-radius: 10px;
-    text-align: left; /* Aligns text to the left */
+    text-align: left;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     width: 500px;
 }
@@ -297,6 +334,3 @@ body {
 .popup-btn:hover {
     background-color: #4eb7ec;
 }
-
-
-
