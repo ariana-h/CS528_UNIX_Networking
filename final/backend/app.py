@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 from datetime import date, datetime
 
-from content_filter import check_misinformation, check_offensive  # updated import
+from content_filter import check_misinformation, check_offensive  
 
 API_KEY = "123456789abcdef"
 
@@ -19,11 +19,11 @@ db = SQLAlchemy(app)
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(300), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # timestamp for housekeeping
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_offensive = db.Column(db.Boolean, default=False)
     is_misinformation = db.Column(db.Boolean, default=False)
-    misinfo_expl = db.Column(db.Text)      # NEW
-    offensive_expl = db.Column(db.Text)    # NEW
+    misinfo_expl = db.Column(db.Text)     
+    offensive_expl = db.Column(db.Text)   
 
 class DailySummary(db.Model):
     summary_date = db.Column(db.Date, primary_key=True, default=date.today)

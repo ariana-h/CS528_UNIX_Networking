@@ -10,6 +10,9 @@ function App() {
   const [showWelcomePopup, setShowWelcomePopup] = useState(true);
   const [openDropdowns, setOpenDropdowns] = useState({});
 
+  // ────────────────────────────────────────────────────────────────
+  // Fetch messages periodically
+  // ────────────────────────────────────────────────────────────────
   useEffect(() => {
     const refresh = async () => {
       const msgs = await fetchMessages();
@@ -21,6 +24,9 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // ────────────────────────────────────────────────────────────────
+  // Handlers
+  // ────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addMessage(content);
@@ -35,12 +41,9 @@ function App() {
   const toggleDropdown = (idx) =>
     setOpenDropdowns((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
-  const oneLineSummary = (msg) => {
-    if (msg.is_misinformation && msg.misinfo_expl) return msg.misinfo_expl;
-    if (msg.is_offensive && msg.offensive_expl) return msg.offensive_expl;
-    return "";
-  };
-
+  // ────────────────────────────────────────────────────────────────
+  // Render
+  // ────────────────────────────────────────────────────────────────
   return (
     <div className="container">
       {/* Welcome Popup */}
@@ -107,34 +110,31 @@ function App() {
                       Offensive: {msg.is_offensive ? "Yes 🚫" : "No ✅"}
                     </span>
 
-                    {/* concise, always‑visible model summary */}
-                    {oneLineSummary(msg) && (
-                      <span className="summary-snippet">{oneLineSummary(msg)}</span>
-                    )}
-
                     {/* dropdown toggle */}
                     <button className="trust-dropdown" onClick={() => toggleDropdown(idx)}>
                       {openDropdowns[idx] ? "▾" : "▸"}
                     </button>
 
-                    {/* dropdown details */}
-                    {openDropdowns[idx] && (
-                      <div className="dropdown-explanation">
-                        {msg.is_misinformation && msg.misinfo_expl && (
-                          <p>
-                            <strong>Misinformation →</strong> {msg.misinfo_expl}
-                          </p>
-                        )}
-                        {msg.is_offensive && msg.offensive_expl && (
-                          <p>
-                            <strong>Offensive →</strong> {msg.offensive_expl}
-                          </p>
-                        )}
-                        {!(msg.is_misinformation || msg.is_offensive) && (
-                          <p>This post appears fine. No issues detected.</p>
-                        )}
-                      </div>
-                    )}
+                    {/* dropdown details (always mounted, visibility via class) */}
+                    <div
+                      className={`dropdown-explanation ${
+                        openDropdowns[idx] ? "open" : ""
+                      }`}
+                    >
+                      {msg.is_misinformation && msg.misinfo_expl && (
+                        <p>
+                          <strong>Misinformation →</strong> {msg.misinfo_expl}
+                        </p>
+                      )}
+                      {msg.is_offensive && msg.offensive_expl && (
+                        <p>
+                          <strong>Offensive →</strong> {msg.offensive_expl}
+                        </p>
+                      )}
+                      {!(msg.is_misinformation || msg.is_offensive) && (
+                        <p>This post appears fine. No issues detected.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
