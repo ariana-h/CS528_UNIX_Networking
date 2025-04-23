@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
-import { fetchMessages, addMessage } from "./api";
+import { fetchMessages, addMessage, fetchSummaries } from "./api";
 
 function App() {
   const [messages, setMessages] = useState([]);
+  const [summaries, setSummaries] = useState([]);
   const [content, setContent] = useState("");
   const [activeTab, setActiveTab] = useState("posts");
   const [showPostBox, setShowPostBox] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(true);
   const [openDropdowns, setOpenDropdowns] = useState({});
 
-  // ────────────────────────────────────────────────────────────────
-  // Fetch messages periodically
-  // ────────────────────────────────────────────────────────────────
   useEffect(() => {
-    const refresh = async () => {
+    const loadMessages = async () => {
       const msgs = await fetchMessages();
       setMessages(msgs);
     };
+    const loadSummaries = async () => {
+      const data = await fetchSummaries();
+      setSummaries(data);
+    };
 
-    refresh();
-    const interval = setInterval(refresh, 5_000);
+    loadMessages();
+    loadSummaries();
+    const interval = setInterval(loadMessages, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // ────────────────────────────────────────────────────────────────
-  // Handlers
-  // ────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addMessage(content);
@@ -37,16 +37,11 @@ function App() {
   };
 
   const closeWelcomePopup = () => setShowWelcomePopup(false);
-
   const toggleDropdown = (idx) =>
     setOpenDropdowns((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
-  // ────────────────────────────────────────────────────────────────
-  // Render
-  // ────────────────────────────────────────────────────────────────
   return (
     <div className="container">
-      {/* Welcome Popup */}
       {showWelcomePopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -65,7 +60,6 @@ function App() {
         </div>
       )}
 
-      {/* Sidebar */}
       <nav className="sidebar">
         <div className="logo-title">
           <img src="/llama.svg" alt="LlamaFeed Logo" className="logo" />
@@ -78,58 +72,38 @@ function App() {
         </button>
       </nav>
 
-      {/* Main Content */}
       <div className="main-content">
         <div className="header">
           <h1 className="title">LlamaFeed</h1>
         </div>
-        {activeTab === "posts" && <h2 className="subtitle">Home</h2>}
-        {activeTab === "summaries" && <h2 className="subtitle">Summaries</h2>}
+        <h2 className="subtitle">{activeTab === "posts" ? "Home" : "Summaries"}</h2>
 
-        {/* POSTS TAB */}
         {activeTab === "posts" && (
           <div className="posts-container">
             <div className="posts-row">
-              <div className="posts-title">
-                <h3>Posts</h3>
-              </div>
-              <div className="trust-indicator-title">
-                <h3>Trust Indicator</h3>
-              </div>
+              <div className="posts-title"><h3>Posts</h3></div>
+              <div className="trust-indicator-title"><h3>Trust Indicator</h3></div>
             </div>
 
             <div className="posts">
               {messages.map((msg, idx) => (
                 <div key={idx} className="post-row">
                   <div className="post">{msg.content}</div>
-
                   <div className="trust-indicator">
                     <span>
                       Misinformation: {msg.is_misinformation ? "Yes ⚠️" : "No ✅"}
                       <br />
                       Offensive: {msg.is_offensive ? "Yes 🚫" : "No ✅"}
                     </span>
-
-                    {/* dropdown toggle */}
                     <button className="trust-dropdown" onClick={() => toggleDropdown(idx)}>
                       {openDropdowns[idx] ? "▾" : "▸"}
                     </button>
-
-                    {/* dropdown details (always mounted, visibility via class) */}
-                    <div
-                      className={`dropdown-explanation ${
-                        openDropdowns[idx] ? "open" : ""
-                      }`}
-                    >
+                    <div className={`dropdown-explanation ${openDropdowns[idx] ? "open" : ""}`}>
                       {msg.is_misinformation && msg.misinfo_expl && (
-                        <p>
-                          <strong>Misinformation →</strong> {msg.misinfo_expl}
-                        </p>
+                        <p><strong>Misinformation →</strong> {msg.misinfo_expl}</p>
                       )}
                       {msg.is_offensive && msg.offensive_expl && (
-                        <p>
-                          <strong>Offensive →</strong> {msg.offensive_expl}
-                        </p>
+                        <p><strong>Offensive →</strong> {msg.offensive_expl}</p>
                       )}
                       {!(msg.is_misinformation || msg.is_offensive) && (
                         <p>This post appears fine. No issues detected.</p>
@@ -142,25 +116,31 @@ function App() {
           </div>
         )}
 
-        {/* SUMMARIES TAB (placeholder) */}
         {activeTab === "summaries" && (
           <div className="summaries">
             <div className="summary-container">
-              <div className="summary-box">
-                <h3>Day 1</h3>
-                <p>This is an empty summary box. You can add your content here.</p>
-              </div>
+              {summaries.length === 0 ? (
+                <p>No summaries yet.</p>
+              ) : (
+                summaries.map((summary, idx) => (
+                  <div key={summary.id || idx} className="summary-box">
+                    <h3>Summary #{summaries.length - idx}</h3>
+                    <p>{summary.content}</p>
+                    <div className="summary-timestamp">
+                      <small>Generated at: {new Date(summary.run_time).toLocaleString()}</small>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Floating action button */}
       <button className="floating-button" onClick={() => setShowPostBox(true)}>
         +
       </button>
 
-      {/* New Post Modal */}
       {showPostBox && (
         <div className="post-box-overlay">
           <div className="post-box">

@@ -10,8 +10,13 @@ export async function addMessage(content) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-API-KEY": "123456789abcdef", 
+            "X-API-KEY": "123456789abcdef",
         },
         body: JSON.stringify({ content }),
     });
+}
+
+export async function fetchSummaries() {
+    const res = await fetch(`${API_URL}/daily_summaries`);
+    return res.json();
 }
