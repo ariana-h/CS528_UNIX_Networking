@@ -127,7 +127,7 @@ function App() {
                     <h3>Summary #{summaries.length - idx}</h3>
                     <p>{summary.content}</p>
                     <div className="summary-timestamp">
-                      <small>Generated at: {new Date(summary.run_time).toLocaleString()}</small>
+                      <small>Generated at: {new Date(summary.run_time).toLocaleString()} UTC</small>
                     </div>
                   </div>
                 ))
