@@ -64,7 +64,7 @@ body {
 
 .title {
     font-size: 48px;
-    font-family: 'Copperplate', fantasy;
+    font-family: 'Changa One', sans-serif;
     font-weight: bold;
     color: #56b0dd;
 }
@@ -182,7 +182,7 @@ body {
 
 .post-box {
     background: white;
-    font-family: 'Copperplate', fantasy;
+    font-family: 'Changa One', sans-serif;
     font-size: 25px;
     color: #56b0dd;
     padding: 20px;
@@ -335,8 +335,8 @@ body {
 }
 
 .popup-title {
-    font-size: 40px;
-    font-family: 'Copperplate', fantasy;
+    font-size: 38px;
+    font-family: 'Changa One', sans-serif;
     color: #56b0dd;
     margin-bottom: 10px;
     display: flex;
